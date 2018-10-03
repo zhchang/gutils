@@ -1,2 +1,2 @@
 #!/bin/sh
-python -m gus $1
+python -m gus $@

@@ -7,12 +7,11 @@ import json
 from os.path import expanduser
 
 
-
 class GUtils(CliApp):
 
     def get_stats_by_author(self, author, since):
-        cmd = "git lol --author='{}' --since='{}'".format(author,since)
-        o,r = self.shell_run(cmd, silent=True)
+        cmd = "git lol --author='{}' --since='{}'".format(author, since)
+        o, r = self.shell_run(cmd, silent=True)
         if r != 0:
             return 'something wrong with the git command execution: {}'.format(o)
         additions = 0
@@ -32,30 +31,26 @@ class GUtils(CliApp):
                         deletions += int(items[1])
                     except:
                         continue
-        print author, (commits,additions,deletions)
+        print author, (commits, additions, deletions)
 
     def get_authors_from_config(self):
-        with open('{}/.gs'.format(expanduser('~')),'r') as f:
+        with open('{}/.gs'.format(expanduser('~')), 'r') as f:
             cfg = json.load(f)
             return cfg['authors']
-
-
 
     def do_stats(self, **kwargs):
         author = kwargs.get('author', None)
         since = kwargs.get('since', '3 month ago')
         try:
             if author != None:
-                self.get_stats_by_author(author,since)
+                self.get_stats_by_author(author, since)
             else:
                 authors = self.get_authors_from_config()
                 if authors != None:
                     for author in authors:
-                        self.get_stats_by_author(author,since)
+                        self.get_stats_by_author(author, since)
         except Exception as e:
             print 'something is wrong: {}'.format(e)
-
-
 
 
 if __name__ == '__main__':

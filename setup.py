@@ -1,5 +1,5 @@
 from distutils.core import setup
-ver = '1.0.7'
+ver = '1.0.8'
 setup(
     name='gus',
     packages=['gus'],  # this must be the same as the name above
