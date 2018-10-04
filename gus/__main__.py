@@ -20,6 +20,7 @@ class GUtils(CliApp):
         commits = 0
         if len(o) > 0:
             for line in o:
+                line = line.decode()
                 if line.startswith('*'):
                     commits += 1
                     continue
@@ -62,7 +63,7 @@ class GUtils(CliApp):
         except:
             print ('invalid input for max, default to 5 now.')
             max = 5
-        cmd = 'git shortlog -ns -- {}'.format(path)
+        cmd = 'git shortlog -nse -- {}'.format(path)
         o, r = self.shell_run(cmd, silent=True)
         if r != 0:
             print ('something went wrong with the git shortlog command execution: {}'.format(o))
