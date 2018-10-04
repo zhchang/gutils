@@ -10,7 +10,8 @@ from os.path import expanduser
 class GUtils(CliApp):
 
     def get_stats_by_author(self, author, since):
-        cmd = "git log --graph --decorate --pretty=oneline --abbrev-commit  --numstat --author='{}' --since='{}'".format(author, since)
+        cmd = "git log --graph --decorate --pretty=oneline --abbrev-commit  --numstat --author='{}' --since='{}'".format(
+            author, since)
         o, r = self.shell_run(cmd, silent=True)
         if r != 0:
             return 'something wrong with the git command execution: {}'.format(o)
@@ -31,7 +32,7 @@ class GUtils(CliApp):
                         deletions += int(items[1])
                     except:
                         continue
-        print author, (commits, additions, deletions)
+        print ("{}\t{}\t{}\t{}".format(author, commits, additions, deletions))
 
     def get_authors_from_config(self):
         with open('{}/.gs'.format(expanduser('~')), 'r') as f:
@@ -41,6 +42,7 @@ class GUtils(CliApp):
     def do_stats(self, **kwargs):
         author = kwargs.get('author', None)
         since = kwargs.get('since', '3 month ago')
+        print ("{}\t{}\t{}\t{}".format('author', 'commits', 'additions', 'deletions'))
         try:
             if author != None:
                 self.get_stats_by_author(author, since)
@@ -50,7 +52,25 @@ class GUtils(CliApp):
                     for author in authors:
                         self.get_stats_by_author(author, since)
         except Exception as e:
-            print 'something is wrong: {}'.format(e)
+            print ('something is wrong: {}'.format(e))
+
+    def do_who(self, **kwargs):
+        path = kwargs.get('path', '.')
+        max_str = kwargs.get('max', '5')
+        try:
+            max = int(max_str)
+        except:
+            print ('invalid input for max, default to 5 now.')
+            max = 5
+        cmd = 'git shortlog -ns -- {}'.format(path)
+        o, r = self.shell_run(cmd, silent=True)
+        if r != 0:
+            print ('something went wrong with the git shortlog command execution: {}'.format(o))
+            return
+        if len(o) > 0:
+            print ('commits\tauthor')
+            for line in o[:max]:
+                print (line.decode())
 
 
 if __name__ == '__main__':
