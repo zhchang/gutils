@@ -1,10 +1,11 @@
 # Make sure you replace the API and/or APP key below
 # with the ones for your account
 
-from cliapp import CliApp
+from cliapp import CliApp, output
 import sys
 import json
 from os.path import expanduser
+from os.path import exists as pexists
 
 
 class GUtils(CliApp):
@@ -33,13 +34,17 @@ class GUtils(CliApp):
                         deletions += int(items[1])
                     except:
                         continue
-        print ("{}\t{}\t{}\t{}".format(author, commits, additions, deletions))
+        return "{}\t{}\t{}\t{}".format(author, commits, additions, deletions)
 
     def get_authors_from_config(self):
-        with open('{}/.gs'.format(expanduser('~')), 'r') as f:
+        cp = '{}/.gs'.format(expanduser('~'))
+        if not pexists(cp):
+            return []
+        with open(cp, 'r') as f:
             cfg = json.load(f)
             return cfg['authors']
 
+    @output
     def do_stats(self, **kwargs):
         """gus stats author=<author> since=<since>
         since is default to '3 month ago'
@@ -47,18 +52,22 @@ class GUtils(CliApp):
         """
         author = kwargs.get('author', None)
         since = kwargs.get('since', '3 month ago')
-        print ("{}\t{}\t{}\t{}".format('author', 'commits', 'additions', 'deletions'))
+        out = list()
+        out.append("{}\t{}\t{}\t{}".format('author', 'commits', 'additions', 'deletions'))
         try:
-            if author != None:
-                self.get_stats_by_author(author, since)
+            if author is not None:
+                out.append(self.get_stats_by_author(author, since))
             else:
                 authors = self.get_authors_from_config()
-                if authors != None:
-                    for author in authors:
-                        self.get_stats_by_author(author, since)
+                if authors is None or len(authors) == 0:
+                    return ''
+                for author in authors:
+                    out.append(self.get_stats_by_author(author, since))
         except Exception as e:
-            print ('something is wrong: {}'.format(e))
+            return 'something is wrong: {}'.format(e)
+        return '\n'.join(out)
 
+    @output
     def do_who(self, **kwargs):
         """gus who path=<path> max=<max>
         max is default to 5
@@ -69,17 +78,17 @@ class GUtils(CliApp):
         try:
             max = int(max_str)
         except:
-            print ('invalid input for max, default to 5 now.')
             max = 5
+        out = list()
         cmd = 'git shortlog -nse -- {}'.format(path)
         o, r = self.shell_run(cmd, silent=True)
         if r != 0:
-            print ('something went wrong with the git shortlog command execution: {}'.format(o))
-            return
+            return'something went wrong with the git shortlog command execution: {}'.format(o)
         if len(o) > 0:
-            print ('commits\tauthor')
+            out.append('commits\tauthor')
             for line in o[:max]:
-                print (line.decode())
+                out.append(line.decode())
+        return '\n'.join(out)
 
 
 if __name__ == '__main__':
