@@ -41,6 +41,10 @@ class GUtils(CliApp):
             return cfg['authors']
 
     def do_stats(self, **kwargs):
+        """gus stats author=<author> since=<since>
+        since is default to '3 month ago
+        When author is not specified, gus will try to read from ~/.gs (sample content: {"author":["author1","author2"]}
+        """
         author = kwargs.get('author', None)
         since = kwargs.get('since', '3 month ago')
         print ("{}\t{}\t{}\t{}".format('author', 'commits', 'additions', 'deletions'))
@@ -56,6 +60,10 @@ class GUtils(CliApp):
             print ('something is wrong: {}'.format(e))
 
     def do_who(self, **kwargs):
+        """gus who path=<path> max=<max>
+        max is default to
+        path is default to . (current working directory)
+        """
         path = kwargs.get('path', '.')
         max_str = kwargs.get('max', '5')
         try:

@@ -1,5 +1,5 @@
 from distutils.core import setup
-ver = '1.0.17'
+ver = '1.0.18'
 setup(
     name='gus',
     packages=['gus'],  # this must be the same as the name above
@@ -12,7 +12,7 @@ setup(
     keywords=['python', 'git', 'util'],  # arbitrary keywords
     scripts=['scripts/gus'],
     install_requires=[
-          'cliapp>=1.0.5',
+          'cliapp>=1.0.6',
       ],
     classifiers=[],
 )
