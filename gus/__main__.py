@@ -42,7 +42,7 @@ class GUtils(CliApp):
 
     def do_stats(self, **kwargs):
         """gus stats author=<author> since=<since>
-        since is default to '3 month ago
+        since is default to '3 month ago'
         When author is not specified, gus will try to read from ~/.gs (sample content: {"author":["author1","author2"]}
         """
         author = kwargs.get('author', None)
@@ -61,7 +61,7 @@ class GUtils(CliApp):
 
     def do_who(self, **kwargs):
         """gus who path=<path> max=<max>
-        max is default to
+        max is default to 5
         path is default to . (current working directory)
         """
         path = kwargs.get('path', '.')
