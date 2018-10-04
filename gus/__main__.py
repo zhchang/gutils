@@ -10,7 +10,7 @@ from os.path import expanduser
 class GUtils(CliApp):
 
     def get_stats_by_author(self, author, since):
-        cmd = "git lol --author='{}' --since='{}'".format(author, since)
+        cmd = "git log --graph --decorate --pretty=oneline --abbrev-commit  --numstat --author='{}' --since='{}'".format(author, since)
         o, r = self.shell_run(cmd, silent=True)
         if r != 0:
             return 'something wrong with the git command execution: {}'.format(o)
