@@ -60,7 +60,7 @@ class GUtils(CliApp):
             else:
                 authors = self.get_authors_from_config()
                 if authors is None or len(authors) == 0:
-                    return ''
+                    return 'there is no authors specified. you can specify authors through cli or ~/.gs config file'
                 for author in authors:
                     out.append(self.get_stats_by_author(author, since))
         except Exception as e:
@@ -80,15 +80,34 @@ class GUtils(CliApp):
         except:
             max = 5
         out = list()
+        items = dict()
         cmd = 'git shortlog -nse -- {}'.format(path)
         o, r = self.shell_run(cmd, silent=True)
         if r != 0:
-            return'something went wrong with the git shortlog command execution: {}'.format(o)
+            return 'something went wrong with the git shortlog command execution: {}'.format(o)
         if len(o) > 0:
+            for line in o:
+                line = line.decode()
+                email = line[line.find("<") + 1:line.find(">")]
+                if len(email) == 0:
+                    continue
+                parts = line.split('\t')
+                thing = []
+                if len(parts) == 2:
+                    try:
+                        thing = [int(parts[0]), line]
+                    except:
+                        continue
+                if email in items:
+                    thing[0] += items[email][0]
+                items[email] = thing
+            print(items.items())
+            sorted_items = [value for (key, value) in sorted(items.items(), key=lambda a: a[1][0], reverse=True)]
             out.append('commits\tauthor')
-            for line in o[:max]:
-                out.append(line.decode())
-        return '\n'.join(out)
+            for item in sorted_items[:max]:
+                out.append(item[1])
+            return '\n'.join(out)
+        return 'nothing'
 
 
 if __name__ == '__main__':
