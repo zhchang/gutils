@@ -13,6 +13,7 @@ class GUtils(CliApp):
     def get_stats_by_author(self, author, since):
         cmd = "git log --graph --decorate --pretty=oneline --abbrev-commit  --numstat --author='{}' --since='{}'".format(
             author, since)
+        print(cmd)
         o, r = self.shell_run(cmd, silent=True)
         if r != 0:
             return 'something wrong with the git command execution: {}'.format(o)
@@ -21,7 +22,7 @@ class GUtils(CliApp):
         commits = 0
         if len(o) > 0:
             for line in o:
-                line = line.decode()
+                line = line.decode(encoding='UTF-8')
                 if line.startswith('*'):
                     commits += 1
                     continue
@@ -87,7 +88,7 @@ class GUtils(CliApp):
             return 'something went wrong with the git shortlog command execution: {}'.format(o)
         if len(o) > 0:
             for line in o:
-                line = line.decode()
+                line = line.decode(encoding='UTF-8')
                 email = line[line.find("<") + 1:line.find(">")]
                 if len(email) == 0:
                     continue
@@ -95,17 +96,17 @@ class GUtils(CliApp):
                 thing = []
                 if len(parts) == 2:
                     try:
-                        thing = [int(parts[0]), line]
+                        thing = [int(parts[0]), parts[1]]
                     except:
                         continue
                 if email in items:
                     thing[0] += items[email][0]
                 items[email] = thing
-            print(items.items())
+            #print(items.items())
             sorted_items = [value for (key, value) in sorted(items.items(), key=lambda a: a[1][0], reverse=True)]
             out.append('commits\tauthor')
             for item in sorted_items[:max]:
-                out.append(item[1])
+                out.append('{}\t{}'.format(item[0],item[1]))
             return '\n'.join(out)
         return 'nothing'
 
